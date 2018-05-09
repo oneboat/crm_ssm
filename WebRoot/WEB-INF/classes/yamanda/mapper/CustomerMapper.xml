@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="yamanda.mapper.CustomerMapper">
+	
+	<select id="selectPage" parameterType="QueryVo" resultType="Customer">
+		SELECT
+		a.cust_id,
+		a.cust_name,
+		a.cust_user_id,
+		a.cust_create_id,
+		b.dict_item_name cust_source,
+		c.dict_item_name cust_industry,
+		d.dict_item_name cust_level,
+		a.cust_linkman,
+		a.cust_phone,
+		a.cust_mobile,
+		a.cust_zipcode,
+		a.cust_address,
+		a.cust_createtime
+		
+	  FROM
+		customer a
+		LEFT JOIN base_dict b ON a.cust_source = b.dict_id
+		LEFT JOIN base_dict c ON a.cust_industry = c.dict_id
+		LEFT JOIN base_dict d ON a.cust_level = d.dict_id
+		
+		<where>
+			<if test="null != custName and '' != custName">
+				cust_name like "%"#{custName}"%"
+			</if>
+			<if test="null != custSource and '' != custSource">
+				and cust_source=#{custSource}
+			</if>
+			<if test="null != custIndustry and '' != custIndustry">
+				and cust_industry=#{custIndustry}
+			</if>
+			<if test="null != custLevel and '' != custLevel">
+				and cust_level=#{custLevel}
+			</if>
+		</where>
+		limit #{start},#{size}
+		
+		
+	</select>
+	
+	<!-- private String custName;   //客户名称
+	private String custSource;   //客户来源
+	private String custIndustry;  //客户行业
+	private String custLevel;  //客户级别 -->
+	<select id="countByQueryVo" parameterType="QueryVo" resultType="Integer">
+		SELECT
+		count(*)
+	  FROM
+		customer 
+		<where>
+			<if test="null != custName and '' != custName">
+				cust_name like "%"#{custName}"%"
+			</if>
+			<if test="null != custSource and '' != custSource">
+				and cust_source=#{custSource}
+			</if>
+			<if test="null != custIndustry and '' != custIndustry">
+				and cust_industry=#{custIndustry}
+			</if>
+			<if test="null != custLevel and '' != custLevel">
+				and cust_level=#{custLevel}
+			</if>
+		</where>
+		
+		
+	</select>
+	<select id="selectById" parameterType="Integer" resultType="Customer">
+		select * 
+		from customer
+		<where>
+			cust_id = #{custId}
+		</where> 
+	</select>
+	
+	<update id="update" parameterType="Customer">
+		update customer
+		<set>    <!-- 去掉最后一个逗号 -->
+			<if test="cust_name != null">
+				cust_name = #{cust_name},
+			</if>
+			<if test="cust_linkman != null">
+				cust_linkman = #{cust_linkman}
+			</if>
+		</set>
+		<where>
+			cust_id = #{cust_id}
+		</where>
+	</update>
+	
+	<delete id="deleteById" parameterType="Integer">
+		delete from customer
+		<where>
+			cust_id = #{cust_id}
+		</where>
+	</delete>
+	
+</mapper>
